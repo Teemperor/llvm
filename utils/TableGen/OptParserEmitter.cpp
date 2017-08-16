@@ -298,5 +298,29 @@ void EmitOptParser(RecordKeeper &Records, raw_ostream &OS) {
     OS << ")\n";
   }
   OS << "#endif // OPTION\n";
+
+  OS << "\n";
+  OS << "#ifdef OPTTABLE_ARG_INIT\n";
+  OS << "//////////\n";
+  OS << "// Option Values\n\n";
+  for (unsigned I = 0, E = Opts.size(); I != E; ++I) {
+    const Record &R = *Opts[I];
+    if (!isa<UnsetInit>(R.getValueInit("ValuesCode"))) {
+      OS << "{\n";
+      OS << R.getValueAsString("ValuesCode");
+      OS << "\n";
+      for (const std::string &Pref : R.getValueAsListOfStrings("Prefixes")) {
+        OS << "assert(";
+        OS << "Opt.addValues(";
+        std::string S = (Pref + R.getValueAsString("Name")).str();
+        write_cstring(OS, S);
+        OS << ", Values)";
+        OS << ");\n";
+      }
+      OS << "}\n";
+    }
+  }
+  OS << "\n";
+  OS << "#endif // OPTTABLE_ARG_INIT\n";
 }
 } // end namespace llvm
