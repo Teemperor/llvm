@@ -647,16 +647,19 @@ Error WindowsManifestMerger::WindowsManifestMergerImpl::merge(
 std::unique_ptr<MemoryBuffer>
 WindowsManifestMerger::WindowsManifestMergerImpl::getMergedManifest() {
   unsigned char *XmlBuff;
+  xmlDoc *OutputDoc;
   int BufferSize = 0;
   if (CombinedDoc) {
     xmlNodePtr CombinedRoot = xmlDocGetRootElement(CombinedDoc);
     std::vector<xmlNsPtr> RequiredPrefixes;
     checkAndStripPrefixes(CombinedRoot, RequiredPrefixes);
-    std::unique_ptr<xmlDoc> OutputDoc(xmlNewDoc((const unsigned char *)"1.0"));
-    xmlDocSetRootElement(OutputDoc.get(), CombinedRoot);
+    OutputDoc = xmlNewDoc((const unsigned char *)"1.0"));
+    xmlDocSetRootElement(OutputDoc, CombinedRoot);
     xmlKeepBlanksDefault(0);
-    xmlDocDumpFormatMemoryEnc(OutputDoc.get(), &XmlBuff, &BufferSize, "UTF-8",
-                              1);
+    xmlDocDumpFormatMemoryEnc(OutputDoc, &XmlBuff, &BufferSize, "UTF-8", 1);
+    // libxml2 uses its own custom malloc, so we have to also use its custom
+    // free function.
+    xmlFreeFunc(OutputDoc);
   }
   if (BufferSize == 0)
     return nullptr;
