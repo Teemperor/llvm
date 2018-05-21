@@ -32,6 +32,7 @@ add_llvm_unittest(ADTTests
   IntervalMapTest.cpp
   IntrusiveRefCntPtrTest.cpp
   IteratorTest.cpp
+  LazyVectorTest.cpp
   MakeUniqueTest.cpp
   MappedIteratorTest.cpp
   MapVectorTest.cpp
